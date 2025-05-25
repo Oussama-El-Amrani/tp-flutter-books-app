@@ -57,9 +57,9 @@ class _DetailPageState extends State<DetailPage> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
     }
   }
 
@@ -98,28 +98,102 @@ class _DetailPageState extends State<DetailPage> {
                     color: Colors.grey[200],
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                  child: widget.book.imageUrl.isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            widget.book.imageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.book, size: 50);
-                            },
+                  child:
+                      widget.book.imageUrl.isNotEmpty
+                          ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              widget.book.imageUrl,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (
+                                context,
+                                child,
+                                loadingProgress,
+                              ) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                print(
+                                  'Erreur de chargement image détail pour ${widget.book.title}: $error',
+                                );
+                                return Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: Colors.grey[300],
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.book,
+                                        size: 50,
+                                        color: Colors.grey[600],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Image\nindisponible',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                          : Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.grey[300],
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.book,
+                                  size: 50,
+                                  color: Colors.grey[600],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Pas d\'image',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        )
-                      : const Icon(Icons.book, size: 50),
                 ),
-                
+
                 const SizedBox(width: 16),
-                
+
                 // Informations du livre
                 Expanded(
                   child: Column(
@@ -142,7 +216,7 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // ID du livre
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -166,9 +240,9 @@ class _DetailPageState extends State<DetailPage> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Section Actions
             Card(
               child: Padding(
@@ -184,7 +258,7 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Bouton favori
                     SizedBox(
                       width: double.infinity,
@@ -195,8 +269,8 @@ class _DetailPageState extends State<DetailPage> {
                           color: _isFavorite ? Colors.red : null,
                         ),
                         label: Text(
-                          _isFavorite 
-                              ? 'Retirer des favoris' 
+                          _isFavorite
+                              ? 'Retirer des favoris'
                               : 'Ajouter aux favoris',
                         ),
                         style: ElevatedButton.styleFrom(
@@ -208,9 +282,9 @@ class _DetailPageState extends State<DetailPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Section Informations
             Card(
               child: Padding(
@@ -226,13 +300,13 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     _buildInfoRow('Titre', widget.book.title),
                     const SizedBox(height: 8),
                     _buildInfoRow('Auteur', widget.book.author),
                     const SizedBox(height: 8),
                     _buildInfoRow('ID', widget.book.id),
-                    
+
                     if (widget.book.imageUrl.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       _buildInfoRow('Image', 'Disponible'),
@@ -261,12 +335,7 @@ class _DetailPageState extends State<DetailPage> {
             ),
           ),
         ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ),
+        Expanded(child: Text(value, style: const TextStyle(fontSize: 16))),
       ],
     );
   }

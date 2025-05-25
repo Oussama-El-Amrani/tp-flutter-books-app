@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/book.dart';
 import '../services/api_service.dart';
 import '../services/db_service.dart';
+import '../widgets/image_info_banner.dart';
 import 'detail_page.dart';
 import 'favorites_page.dart';
 
@@ -82,9 +83,9 @@ class _HomePageState extends State<HomePage> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
     }
   }
 
@@ -108,6 +109,9 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
+          // Banner d'information sur les images
+          const ImageInfoBanner(),
+
           // Barre de recherche
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -132,11 +136,9 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          
+
           // Contenu principal
-          Expanded(
-            child: _buildContent(),
-          ),
+          Expanded(child: _buildContent()),
         ],
       ),
     );
@@ -201,9 +203,7 @@ class _HomePageState extends State<HomePage> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => DetailPage(book: book),
-                ),
+                MaterialPageRoute(builder: (context) => DetailPage(book: book)),
               );
             },
             child: Column(
@@ -215,24 +215,97 @@ class _HomePageState extends State<HomePage> {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(4),
+                      ),
                       color: Colors.grey[200],
                     ),
-                    child: book.imageUrl.isNotEmpty
-                        ? ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-                            child: Image.network(
-                              book.imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(Icons.book, size: 50);
-                              },
+                    child:
+                        book.imageUrl.isNotEmpty
+                            ? ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(4),
+                              ),
+                              child: Image.network(
+                                book.imageUrl,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (
+                                  context,
+                                  child,
+                                  loadingProgress,
+                                ) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  print(
+                                    'Erreur de chargement image pour ${book.title}: $error',
+                                  );
+                                  return Container(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    color: Colors.grey[300],
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.book,
+                                          size: 40,
+                                          color: Colors.grey[600],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Image\nindisponible',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                            : Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              color: Colors.grey[300],
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.book,
+                                    size: 40,
+                                    color: Colors.grey[600],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Pas d\'image',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          )
-                        : const Icon(Icons.book, size: 50),
                   ),
                 ),
-                
+
                 // Informations du livre
                 Expanded(
                   flex: 2,
@@ -261,13 +334,15 @@ class _HomePageState extends State<HomePage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const Spacer(),
-                        
+
                         // Bouton favori
                         Align(
                           alignment: Alignment.centerRight,
                           child: IconButton(
                             icon: Icon(
-                              isFavorite ? Icons.favorite : Icons.favorite_border,
+                              isFavorite
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
                               color: isFavorite ? Colors.red : Colors.grey,
                             ),
                             onPressed: () => _toggleFavorite(book),

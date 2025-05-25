@@ -7,10 +7,10 @@ void main() {
     test('searchBooks should return list of books for valid query', () async {
       // Test avec une recherche simple
       final books = await ApiService.searchBooks('flutter');
-      
+
       expect(books, isA<List<Book>>());
       expect(books.isNotEmpty, true);
-      
+
       // Vérifier que les livres ont les propriétés requises
       for (final book in books.take(3)) {
         expect(book.id, isNotEmpty);
@@ -29,12 +29,12 @@ void main() {
       // D'abord, obtenir un livre via la recherche
       final searchResults = await ApiService.searchBooks('flutter');
       expect(searchResults.isNotEmpty, true);
-      
+
       final firstBook = searchResults.first;
-      
+
       // Ensuite, obtenir les détails de ce livre
       final bookDetails = await ApiService.getBookDetails(firstBook.id);
-      
+
       expect(bookDetails, isNotNull);
       expect(bookDetails!.id, equals(firstBook.id));
       expect(bookDetails.title, isNotEmpty);
@@ -55,9 +55,9 @@ void main() {
           'authors': ['Author One', 'Author Two'],
           'imageLinks': {
             'thumbnail': 'https://example.com/thumbnail.jpg',
-            'smallThumbnail': 'https://example.com/small.jpg'
-          }
-        }
+            'smallThumbnail': 'https://example.com/small.jpg',
+          },
+        },
       };
 
       final book = Book.fromJson(jsonData);
@@ -69,9 +69,9 @@ void main() {
     });
 
     test('Book.fromJson should handle missing fields gracefully', () {
-      final jsonData = {
+      final jsonData = <String, dynamic>{
         'id': 'test_id_456',
-        'volumeInfo': {}
+        'volumeInfo': <String, dynamic>{},
       };
 
       final book = Book.fromJson(jsonData);
@@ -87,7 +87,7 @@ void main() {
         id: 'test_123',
         title: 'Test Title',
         author: 'Test Author',
-        imageUrl: 'https://example.com/image.jpg'
+        imageUrl: 'https://example.com/image.jpg',
       );
 
       final map = originalBook.toMap();
@@ -104,21 +104,21 @@ void main() {
         id: 'same_id',
         title: 'Title 1',
         author: 'Author 1',
-        imageUrl: 'url1'
+        imageUrl: 'url1',
       );
 
       final book2 = Book(
         id: 'same_id',
         title: 'Title 2',
         author: 'Author 2',
-        imageUrl: 'url2'
+        imageUrl: 'url2',
       );
 
       final book3 = Book(
         id: 'different_id',
         title: 'Title 1',
         author: 'Author 1',
-        imageUrl: 'url1'
+        imageUrl: 'url1',
       );
 
       expect(book1, equals(book2)); // Même ID

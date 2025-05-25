@@ -32,9 +32,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors du chargement: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur lors du chargement: $e')));
     }
   }
 
@@ -45,13 +45,13 @@ class _FavoritesPageState extends State<FavoritesPage> {
       setState(() {
         _favorites.removeWhere((b) => b.id == book.id);
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Livre retiré des favoris')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Livre retiré des favoris')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
     }
   }
 
@@ -59,20 +59,23 @@ class _FavoritesPageState extends State<FavoritesPage> {
   Future<void> _confirmRemoval(Book book) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmer la suppression'),
-        content: Text('Voulez-vous vraiment retirer "${book.title}" de vos favoris ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Annuler'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Confirmer la suppression'),
+            content: Text(
+              'Voulez-vous vraiment retirer "${book.title}" de vos favoris ?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Annuler'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Supprimer'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Supprimer'),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -136,16 +139,14 @@ class _FavoritesPageState extends State<FavoritesPage> {
       itemCount: _favorites.length,
       itemBuilder: (context, index) {
         final book = _favorites[index];
-        
+
         return Card(
           elevation: 4,
           child: InkWell(
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => DetailPage(book: book),
-                ),
+                MaterialPageRoute(builder: (context) => DetailPage(book: book)),
               ).then((_) => _loadFavorites()); // Recharger après retour
             },
             child: Column(
@@ -157,24 +158,97 @@ class _FavoritesPageState extends State<FavoritesPage> {
                   child: Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(4),
+                      ),
                       color: Colors.grey[200],
                     ),
-                    child: book.imageUrl.isNotEmpty
-                        ? ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-                            child: Image.network(
-                              book.imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(Icons.book, size: 50);
-                              },
+                    child:
+                        book.imageUrl.isNotEmpty
+                            ? ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(4),
+                              ),
+                              child: Image.network(
+                                book.imageUrl,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (
+                                  context,
+                                  child,
+                                  loadingProgress,
+                                ) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  print(
+                                    'Erreur de chargement image favori pour ${book.title}: $error',
+                                  );
+                                  return Container(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    color: Colors.grey[300],
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.book,
+                                          size: 40,
+                                          color: Colors.grey[600],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Image\nindisponible',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                            : Container(
+                              width: double.infinity,
+                              height: double.infinity,
+                              color: Colors.grey[300],
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.book,
+                                    size: 40,
+                                    color: Colors.grey[600],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Pas d\'image',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          )
-                        : const Icon(Icons.book, size: 50),
                   ),
                 ),
-                
+
                 // Informations du livre
                 Expanded(
                   flex: 2,
@@ -203,7 +277,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const Spacer(),
-                        
+
                         // Boutons d'action
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -214,7 +288,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                               color: Colors.red,
                               size: 20,
                             ),
-                            
+
                             // Bouton supprimer
                             IconButton(
                               icon: const Icon(
