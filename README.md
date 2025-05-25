@@ -1,26 +1,43 @@
 # 📚 Books App - Application Flutter de Recherche de Livres
 
-Une application Flutter moderne qui permet de rechercher des livres via l'API Google Books et de gérer une liste de favoris localement.
+Une application Flutter qui permet de découvrir des livres via l'API Google Books et de gérer une collection personnelle de favoris. Conçue avec Material 3.
 
-## ✨ Fonctionnalités
+![App Banner](docs/screenshots/first-screen.png)
 
-### 🔍 Recherche de Livres
-- Recherche de livres en temps réel via l'API Google Books
-- Affichage des résultats en grille avec images, titres et auteurs
-- Gestion des états de chargement et d'erreur
+## ✨ Fonctionnalités Principales
 
-### ❤️ Gestion des Favoris
-- Ajout/suppression de livres en favoris avec un simple clic
-- Stockage local persistant avec SQLite
-- Synchronisation en temps réel des statuts favoris
-- Page dédiée pour consulter et gérer les favoris
+### 🔍 **Recherche Intelligente de Livres**
+- **Recherche en temps réel** via l'API Google Books avec plus de 40 millions de livres
+- **Résultats instantanés** avec affichage en grille responsive
+- **Informations complètes** : titre, auteur, couverture et détails
+- **Gestion d'erreurs** avec messages informatifs et possibilité de réessayer
 
-### 📱 Interface Utilisateur
-- Design Material 3 moderne et responsive
-- Navigation fluide entre les pages
-- Grilles adaptatives pour différentes tailles d'écran
-- Gestion intelligente des images avec fallback
-- Messages de confirmation et notifications
+![Recherche de Livres](docs/screenshots/seach-book.png)
+
+### ❤️ **Gestion Avancée des Favoris**
+- **Ajout/suppression instantané** avec un simple clic sur l'icône cœur
+- **Stockage local persistant** : vos favoris restent même après fermeture de l'app
+- **Synchronisation en temps réel** des statuts favoris sur toutes les pages
+- **Page dédiée** pour consulter et organiser votre collection personnelle
+- **Suppression sécurisée** avec confirmation pour éviter les erreurs
+
+![Page des Favoris](docs/screenshots/my-favorites-screen.png)
+
+### 📖 **Pages de Détails Enrichies**
+- **Vue détaillée** de chaque livre avec informations complètes
+- **Images haute résolution** avec effets d'ombre élégants
+- **Gestion des favoris** directement depuis la page de détails
+- **Navigation fluide** avec retour automatique à la page précédente
+
+![Détails du Livre](docs/screenshots/see-more-about-book.png)
+
+### 📱 **Interface Utilisateur Moderne**
+- **Design Material 3** avec thème cohérent et moderne
+- **Responsive design** qui s'adapte à toutes les tailles d'écran
+- **Navigation intuitive** entre les différentes sections
+- **Animations fluides** et transitions élégantes
+- **Gestion intelligente des images** avec placeholders informatifs
+- **Messages de feedback** pour toutes les actions utilisateur
 
 ## 🏗️ Architecture
 
@@ -88,64 +105,3 @@ flutter run -d chrome
 # Sur serveur web local
 flutter run -d web-server --web-port=8080
 ```
-
-## 🧪 Tests
-
-Exécutez les tests avec :
-```bash
-flutter test
-```
-
-## 📖 Utilisation
-
-### Recherche de Livres
-1. Ouvrez l'application
-2. Tapez votre recherche dans la barre de recherche
-3. Appuyez sur "Rechercher" ou Entrée
-4. Parcourez les résultats en grille
-
-### Gestion des Favoris
-1. Cliquez sur l'icône ❤️ sur un livre pour l'ajouter aux favoris
-2. L'icône devient rouge ❤️ quand le livre est en favori
-3. Accédez à vos favoris via l'icône ❤️ dans la barre d'application
-4. Supprimez un favori en cliquant sur l'icône 🗑️
-
-### Navigation
-- **Page d'accueil** : Recherche et découverte de livres
-- **Page de détails** : Informations complètes sur un livre
-- **Page favoris** : Gestion de votre collection personnelle
-
-## 🔧 Configuration API
-
-L'application utilise l'API Google Books publique :
-- **URL de base** : `https://www.googleapis.com/books/v1/volumes`
-- **Paramètres** : `?q={query}&maxResults=20`
-- **Aucune clé API requise** pour l'utilisation basique
-
-## 🎨 Captures d'écran
-
-*[Ajoutez ici des captures d'écran de votre application]*
-
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! N'hésitez pas à :
-1. Fork le projet
-2. Créer une branche pour votre fonctionnalité
-3. Commiter vos changements
-4. Pousser vers la branche
-5. Ouvrir une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
-
-## 🆘 Support
-
-Si vous rencontrez des problèmes :
-1. Vérifiez que Flutter est correctement installé : `flutter doctor`
-2. Assurez-vous que les dépendances sont installées : `flutter pub get`
-3. Consultez les logs pour les erreurs spécifiques
-
----
-
-Développé avec ❤️ en Flutter
